@@ -10,7 +10,7 @@ Instructions*
 2. Complete (enjoy)
 
 
-if you want to commit to this project, this is open sourced in the "script folder" where you can find the game code
+if you want to commit to this project, this is open sourced in the "source code" folder where you can find the game code
 and use any code editor (VS studio code) to edit and commit to the game
 
 However, do not copy this project....
