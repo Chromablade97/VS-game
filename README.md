@@ -15,4 +15,6 @@ and use any code editor (VS studio code) to edit and commit to the game
 
 However, do not copy this project....
 
+And if your wondering what the previous version of the game was, check out the "prev.js" file below
+
 Thank you for downloading 
