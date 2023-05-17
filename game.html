@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clicker Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    #square {
+      width: 200px;
+      height: 200px;
+      background-color: lightblue;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #clickCount {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .upgrade-container {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+    }
+
+    .upgrade {
+      display: block;
+      margin-bottom: 10px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .upgrade-tooltip {
+      display: none;
+      position: absolute;
+      top: -30px;
+      right: 0;
+      padding: 5px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      font-size: 12px;
+      border-radius: 3px;
+      pointer-events: none;
+    }
+
+    .upgrade:hover .upgrade-tooltip {
+      display: block;
+    }
+
+    .upgrade-tree {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      display: none;
+    }
+
+    .upgrade-node {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="square"></div>
+  <p id="clickCount">0</p>
+
+  <div class="upgrade-container">
+    <button class="upgrade">Upgrade Click Rate (Cost: 10 clicks)<span class="upgrade-tooltip">Increases the click rate by 1</span></button>
+    <button class="upgrade">Upgrade Click Rate (Cost: 50 clicks)<span class="upgrade-tooltip">Increases the click rate by 1</span></button>
+    <button class="upgrade">Upgrade Click Rate (Cost: 100 clicks)<span class="upgrade-tooltip">Increases the click rate by 1</span></button>
+    <button class="upgrade">Upgrade Click Rate (Cost: 200 clicks)<span class="upgrade-tooltip">Increases the click rate by 1</span></button>
+    <button class="upgrade">Upgrade Click Rate (Cost: 500 clicks)<span class="upgrade-tooltip">Increases the click rate by 1</span></button>
+    <button class="upgrade">Upgrade Click Rate (Cost: 1000 clicks)<span class="upgrade-tooltip">Increases the click rate by 1</span></button>
+    <button class="upgrade">Upgrade Click Rate (Cost: 2000 clicks)<span class="upgrade-tooltip">Increases the click rate by 1</span></button>
+    <button class="upgrade">Upgrade Click Rate (Cost: 5000 clicks)<span class="upgrade-tooltip">Increases the click rate by 1</span></button>
+    <button class="upgrade">Upgrade Click Rate (Cost: 10000 clicks)<span class="upgrade-tooltip">Increases the click rate by 1</span></button>
+  </div>
+
+  <button id="open-upgrade-tree" class="upgrade">Open Upgrade Tree<span class="upgrade-tooltip">Opens the upgrade tree</span></button>
+
+  <div class="upgrade-tree">
+    <div class="upgrade-node">
+      <button id="farm-upgrade" class="upgrade">Buy Farm Upgrade (Cost: 5000 clicks)<span class="upgrade-tooltip">Farm: +1000 clicks per minute</span></button>
+      </div>
+      <div class="upgrade-node">
+      <button id="factory-upgrade" class="upgrade">Buy Factory Upgrade (Cost: 20000 clicks)<span class="upgrade-tooltip">Factory: +10000 clicks per 5 minutes</span></button>
+      </div>
+      
+        </div>
+      <button id="rebirth-button" class="upgrade">Rebirth (Cost: 50000 clicks)<span class="upgrade-tooltip">Resets progress and increases click rate multiplier</span></button>
+      
+        <script>
+          let clickCount = 0;
+          let clickRate = 1;
+          let upgradeCosts = [10, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
+          let farmUpgradeCost = 5000;
+          let factoryUpgradeCost = 20000;
+          let farmUpgradeActive = false;
+          let factoryUpgradeActive = false;
+          let rebirthCost = 50000;
+          let rebirthMultiplier = 2;
+      
+          const square = document.getElementById("square");
+          const clickCountElement = document.getElementById("clickCount");
+          const upgradeButtons = document.querySelectorAll(".upgrade");
+          const openUpgradeTreeButton = document.getElementById("open-upgrade-tree");
+          const farmUpgradeButton = document.getElementById("farm-upgrade");
+          const factoryUpgradeButton = document.getElementById("factory-upgrade");
+          const rebirthButton = document.getElementById("rebirth-button");
+      
+          function updateClickCount() {
+            clickCountElement.textContent = clickCount;
+          }
+      
+          function purchaseUpgrade(cost, rateIncrease) {
+            if (clickCount >= cost) {
+              clickCount -= cost;
+              clickRate += rateIncrease;
+              updateClickCount();
+              return true;
+            }
+            return false;
+          }
+      
+          function purchaseFarmUpgrade() {
+            if (clickCount >= farmUpgradeCost) {
+              clickCount -= farmUpgradeCost;
+              farmUpgradeActive = true;
+              updateClickCount();
+              return true;
+            }
+            return false;
+          }
+      
+          function purchaseFactoryUpgrade() {
+            if (clickCount >= factoryUpgradeCost) {
+              clickCount -= factoryUpgradeCost;
+              factoryUpgradeActive = true;
+              updateClickCount();
+              return true;
+            }
+            return false;
+          }
+      
+          function purchaseRebirth() {
+            if (clickCount >= rebirthCost) {
+              clickCount = 0;
+              clickRate *= rebirthMultiplier;
+              updateClickCount();
+              return true;
+            }
+            return false;
+          }
+      
+          function handleUpgradeButtonClick() {
+            const upgradeIndex = Array.from(upgradeButtons).indexOf(this);
+            const upgradeCost = upgradeCosts[upgradeIndex];
+            if (purchaseUpgrade(upgradeCost, 1)) {
+              upgradeCosts[upgradeIndex] *= 2;
+              this.textContent = `Upgrade Click Rate (Cost: ${upgradeCosts[upgradeIndex]} clicks)`;
+            }
+          }
+      
+          function handleOpenUpgradeTreeButtonClick() {
+            openUpgradeTreeButton.style.display = "none";
+            document.querySelector(".upgrade-tree").style.display = "block";
+          }
+      
+          function handleFarmUpgradeButtonClick() {
+            if (purchaseFarmUpgrade()) {
+              farmUpgradeButton.disabled = true;
+              farmUpgradeButton.textContent = "Farm Upgrade (Purchased)";
+            }
+          }
+      
+          function handleFactoryUpgradeButtonClick() {
+            if (purchaseFactoryUpgrade()) {
+              factoryUpgradeButton.disabled = true;
+              factoryUpgradeButton.textContent = "Factory Upgrade (Purchased)";
+            }
+          }
+          function handleRebirthButtonClick() {
+  if (purchaseRebirth()) {
+    rebirthCost *= rebirthMultiplier;
+    rebirthButton.textContent = `Rebirth (Cost: ${rebirthCost} clicks)`;
+  }
+}
+
+square.addEventListener("click", function() {
+  clickCount += clickRate;
+  updateClickCount();
+});
+
+upgradeButtons.forEach(button => {
+  button.addEventListener("click", handleUpgradeButtonClick);
+});
+
+openUpgradeTreeButton.addEventListener("click", handleOpenUpgradeTreeButtonClick);
+farmUpgradeButton.addEventListener("click", handleFarmUpgradeButtonClick);
+factoryUpgradeButton.addEventListener("click", handleFactoryUpgradeButtonClick);
+rebirthButton.addEventListener("click", handleRebirthButtonClick);
+
+setInterval(function() {
+  if (farmUpgradeActive) {
+    clickCount += 1000;
+    updateClickCount();
+  }
+}, 60000);
+
+setInterval(function() {
+  if (factoryUpgradeActive) {
+    clickCount += 10000;
+    updateClickCount();
+  }
+}, 300000);
+</script>
+</body>
+</html>
